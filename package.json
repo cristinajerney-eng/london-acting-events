@@ -1,0 +1,13 @@
+{
+  "name": "london-acting-events",
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "build": "node build.js"
+  },
+  "dependencies": {
+    "node-fetch": "^3.3.2",
+    "cheerio": "^1.0.0-rc.12",
+    "ical-generator": "^4.1.0"
+  }
+}
