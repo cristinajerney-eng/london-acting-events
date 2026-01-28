@@ -18,7 +18,7 @@ const EMAIL_CONFIG = {
 // Scrape Eventbrite for London acting events
 async function scrapeEventbrite() {
   const events = [];
-  const searchTerms = ['acting', 'theatre-networking', 'screen-acting'];
+  const searchTerms = ['acting', 'theatre-networking', 'screen-acting', 'casting'];
   
   for (const term of searchTerms) {
     try {
@@ -56,7 +56,6 @@ async function scrapeEventbrite() {
         }
       });
       
-      // Small delay to be respectful
       await new Promise(resolve => setTimeout(resolve, 1000));
       
     } catch (error) {
@@ -68,284 +67,186 @@ async function scrapeEventbrite() {
   return events;
 }
 
-// Comprehensive manual events from all venues
-const manualEvents = [
-  // The Cockpit Theatre
-  {
-    title: "The Cockpit Theatre - New Writing Platform",
-    start: new Date('2026-02-15T19:30:00'),
-    end: new Date('2026-02-15T21:30:00'),
-    location: "The Cockpit Theatre, Gateforth Street, London NW8 8EH",
-    description: "Monthly showcase of new plays with post-show discussion",
-    url: "https://thecockpit.org.uk",
-    source: "The Cockpit Theatre"
-  },
-  {
-    title: "The Cockpit Theatre - Meet the Programmers",
-    start: new Date('2026-03-08T15:00:00'),
-    end: new Date('2026-03-08T17:00:00'),
-    location: "The Cockpit Theatre, Gateforth Street, London NW8 8EH",
-    description: "Q&A session about programming opportunities and submissions",
-    url: "https://thecockpit.org.uk",
-    source: "The Cockpit Theatre"
-  },
+// Scrape Meetup for London acting/theatre groups
+async function scrapeMeetup() {
+  const events = [];
+  const searchUrls = [
+    'https://www.meetup.com/find/gb--london/acting/',
+    'https://www.meetup.com/london-acting-alive-in-the-moment-meetup-group/events/',
+    'https://www.meetup.com/performing-arts-for-adults-who-want-to-have-fun/events/'
+  ];
   
-  // Mixing Networks
-  {
-    title: "Mixing Networks - TV & Film Industry Mixer",
-    start: new Date('2026-02-20T18:00:00'),
-    end: new Date('2026-02-20T21:00:00'),
-    location: "Central London (Venue TBC)",
-    description: "Speed networking for actors, directors, producers and crew",
-    url: "https://mixingnetworks.com",
-    source: "Mixing Networks"
-  },
-  {
-    title: "Mixing Networks - Theatre Creatives Social",
-    start: new Date('2026-03-19T19:00:00'),
-    end: new Date('2026-03-19T22:00:00'),
-    location: "Shoreditch, London",
-    description: "Informal networking drinks for theatre professionals",
-    url: "https://mixingnetworks.com",
-    source: "Mixing Networks"
-  },
-  
-  // BFI
-  {
-    title: "BFI - Screen Acting Masterclass",
-    start: new Date('2026-02-22T14:00:00'),
-    end: new Date('2026-02-22T17:00:00'),
-    location: "BFI Southbank, Belvedere Road, London SE1 8XT",
-    description: "Film industry professionals share insights on screen performance",
-    url: "https://www.bfi.org.uk",
-    source: "BFI"
-  },
-  {
-    title: "BFI - Screenwriting & Performance Symposium",
-    start: new Date('2026-03-15T10:00:00'),
-    end: new Date('2026-03-15T17:00:00'),
-    location: "BFI Southbank, Belvedere Road, London SE1 8XT",
-    description: "Full-day event exploring collaboration between writers and actors",
-    url: "https://www.bfi.org.uk",
-    source: "BFI"
-  },
-  
-  // Royal Television Society
-  {
-    title: "RTS - Early Evening Event: Drama Series Production",
-    start: new Date('2026-02-26T18:30:00'),
-    end: new Date('2026-02-26T20:30:00'),
-    location: "London (Venue TBC)",
-    description: "Panel discussion on current trends in TV drama with casting insights",
-    url: "https://rts.org.uk",
-    source: "Royal Television Society"
-  },
-  {
-    title: "RTS Futures - Breaking Into Television Drama",
-    start: new Date('2026-03-20T18:00:00'),
-    end: new Date('2026-03-20T20:00:00'),
-    location: "London (Venue TBC)",
-    description: "Panel of actors and agents discussing TV career pathways",
-    url: "https://rts.org.uk",
-    source: "Royal Television Society"
-  },
-  
-  // Equity
-  {
-    title: "Equity - Members Meeting: Freelance Rights",
-    start: new Date('2026-02-18T19:00:00'),
-    end: new Date('2026-02-18T21:00:00'),
-    location: "Equity Office, Guild House, Upper St Martin's Lane, London WC2H 9EG",
-    description: "Information session on contracts, rights and working conditions",
-    url: "https://www.equity.org.uk",
-    source: "Equity"
-  },
-  {
-    title: "Equity Young Members - Career Development Workshop",
-    start: new Date('2026-03-12T17:00:00'),
-    end: new Date('2026-03-12T19:00:00'),
-    location: "Online",
-    description: "Tax, contracts, and business skills for early-career actors",
-    url: "https://www.equity.org.uk",
-    source: "Equity"
-  },
-  
-  // Omnibus Theatre
-  {
-    title: "Omnibus Theatre - Actor's Lab Open Session",
-    start: new Date('2026-02-25T19:00:00'),
-    end: new Date('2026-02-25T22:00:00'),
-    location: "Omnibus Theatre, 1 Clapham Common North Side, London SW4 0QW",
-    description: "Experimental performance workshop open to all actors",
-    url: "https://omnibus-clapham.org",
-    source: "Omnibus Theatre"
-  },
-  {
-    title: "Omnibus Theatre - New Voices Night",
-    start: new Date('2026-03-17T20:00:00'),
-    end: new Date('2026-03-17T22:30:00'),
-    location: "Omnibus Theatre, 1 Clapham Common North Side, London SW4 0QW",
-    description: "Scratch night performances followed by networking reception",
-    url: "https://omnibus-clapham.org",
-    source: "Omnibus Theatre"
-  },
-  
-  // The Globe
-  {
-    title: "Shakespeare's Globe - Actor Training Taster",
-    start: new Date('2026-03-01T10:00:00'),
-    end: new Date('2026-03-01T13:00:00'),
-    location: "Shakespeare's Globe, 21 New Globe Walk, London SE1 9DT",
-    description: "Introduction to Globe theatre techniques and original practices",
-    url: "https://www.shakespearesglobe.com",
-    source: "The Globe"
-  },
-  {
-    title: "Shakespeare's Globe - Rehearsal Room Insights",
-    start: new Date('2026-03-22T11:00:00'),
-    end: new Date('2026-03-22T13:00:00'),
-    location: "Shakespeare's Globe, 21 New Globe Walk, London SE1 9DT",
-    description: "Watch rehearsals and learn about Globe casting and production",
-    url: "https://www.shakespearesglobe.com",
-    source: "The Globe"
-  },
-  
-  // National Theatre
-  {
-    title: "National Theatre - Platform Talk with Associate Director",
-    start: new Date('2026-02-28T18:30:00'),
-    end: new Date('2026-02-28T20:00:00'),
-    location: "National Theatre, South Bank, London SE1 9PX",
-    description: "Behind-the-scenes insights into NT productions and casting processes",
-    url: "https://www.nationaltheatre.org.uk",
-    source: "National Theatre"
-  },
-  {
-    title: "National Theatre - Public Acts Community Workshop",
-    start: new Date('2026-03-14T14:00:00'),
-    end: new Date('2026-03-14T17:00:00'),
-    location: "National Theatre, South Bank, London SE1 9PX",
-    description: "Free participatory theatre workshop, open to all",
-    url: "https://www.nationaltheatre.org.uk",
-    source: "National Theatre"
-  },
-  
-  // London Theatre Runway
-  {
-    title: "London Theatre Runway - Industry Showcase",
-    start: new Date('2026-02-16T19:00:00'),
-    end: new Date('2026-02-16T21:30:00'),
-    location: "Central London",
-    description: "Networking event connecting emerging theatre makers with industry professionals",
-    url: "https://londontheatrerunway.com",
-    source: "London Theatre Runway"
-  },
-  {
-    title: "London Theatre Runway - Professional Development Series",
-    start: new Date('2026-03-09T14:00:00'),
-    end: new Date('2026-03-09T17:00:00'),
-    location: "Online",
-    description: "Skills workshop for early-career theatre professionals",
-    url: "https://londontheatrerunway.com",
-    source: "London Theatre Runway"
-  },
-  {
-    title: "London Theatre Runway - Audition Technique Masterclass",
-    start: new Date('2026-03-23T10:00:00'),
-    end: new Date('2026-03-23T16:00:00'),
-    location: "Central London",
-    description: "Expert-led session on contemporary audition best practices",
-    url: "https://londontheatrerunway.com",
-    source: "London Theatre Runway"
-  },
-  
-  // TheatreDeli
-  {
-    title: "TheatreDeli - Work-in-Progress Sharing",
-    start: new Date('2026-02-19T20:00:00'),
-    end: new Date('2026-02-19T22:00:00'),
-    location: "TheatreDeli, 107 Leadenhall Street, London EC3A 4AF",
-    description: "Share and receive feedback on work in development",
-    url: "https://theatredeli.co.uk",
-    source: "TheatreDeli"
-  },
-  {
-    title: "TheatreDeli - Creative Networking Lunch",
-    start: new Date('2026-03-06T12:30:00'),
-    end: new Date('2026-03-06T14:30:00'),
-    location: "TheatreDeli, 107 Leadenhall Street, London EC3A 4AF",
-    description: "Informal lunch meetup for actors, writers and directors",
-    url: "https://theatredeli.co.uk",
-    source: "TheatreDeli"
-  },
-  {
-    title: "TheatreDeli - Open Mic Performance Night",
-    start: new Date('2026-03-27T20:00:00'),
-    end: new Date('2026-03-27T22:30:00'),
-    location: "TheatreDeli, 107 Leadenhall Street, London EC3A 4AF",
-    description: "Perform excerpts and network with fellow performers",
-    url: "https://theatredeli.co.uk",
-    source: "TheatreDeli"
-  },
-  
-  // The New Diorama
-  {
-    title: "The New Diorama - Meet the Programmers",
-    start: new Date('2026-02-24T18:00:00'),
-    end: new Date('2026-02-24T20:00:00'),
-    location: "The New Diorama, 15-16 Triton Street, London NW1 3BF",
-    description: "Learn about programming opportunities and submission process",
-    url: "https://newdiorama.com",
-    source: "The New Diorama"
-  },
-  {
-    title: "The New Diorama - Scratch Night",
-    start: new Date('2026-03-11T19:30:00'),
-    end: new Date('2026-03-11T22:00:00'),
-    location: "The New Diorama, 15-16 Triton Street, London NW1 3BF",
-    description: "Showcase of new work with industry feedback and networking",
-    url: "https://newdiorama.com",
-    source: "The New Diorama"
-  },
-  {
-    title: "The New Diorama - Industry Panel: Future of Theatre",
-    start: new Date('2026-03-25T18:30:00'),
-    end: new Date('2026-03-25T20:30:00'),
-    location: "The New Diorama, 15-16 Triton Street, London NW1 3BF",
-    description: "Panel discussion with artistic directors and industry leaders",
-    url: "https://newdiorama.com",
-    source: "The New Diorama"
-  },
-  
-  // Additional Events
-  {
-    title: "Spotlight - Casting Director Q&A",
-    start: new Date('2026-03-05T19:00:00'),
-    end: new Date('2026-03-05T21:00:00'),
-    location: "Online",
-    description: "Live Q&A with leading UK casting directors",
-    url: "https://spotlight.com",
-    source: "Spotlight"
-  },
-  {
-    title: "The Actors Centre - Monthly Networking Evening",
-    start: new Date('2026-02-27T18:00:00'),
-    end: new Date('2026-02-27T21:00:00'),
-    location: "The Actors Centre, Covent Garden, London",
-    description: "Monthly networking event for professional actors",
-    url: "https://actorscentre.co.uk",
-    source: "The Actors Centre"
-  },
-  {
-    title: "Identity School - Screen Acting Workshop",
-    start: new Date('2026-03-13T10:00:00'),
-    end: new Date('2026-03-13T17:00:00'),
-    location: "Identity School of Acting, Clapham, London",
-    description: "Full day intensive screen acting techniques",
-    url: "https://identityschool.co.uk",
-    source: "Identity School of Acting"
+  for (const url of searchUrls) {
+    try {
+      console.log(`🔍 Scraping Meetup...`);
+      
+      const response = await fetch(url, {
+        headers: {
+          'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'
+        }
+      });
+      
+      const html = await response.text();
+      const $ = cheerio.load(html);
+      
+      // Meetup uses structured data
+      $('script[type="application/ld+json"]').each((i, elem) => {
+        try {
+          const data = JSON.parse($(elem).html());
+          if (data['@type'] === 'Event' || (Array.isArray(data) && data[0]?.['@type'] === 'Event')) {
+            const eventData = Array.isArray(data) ? data[0] : data;
+            
+            events.push({
+              title: eventData.name,
+              start: new Date(eventData.startDate),
+              end: new Date(eventData.endDate || eventData.startDate),
+              location: eventData.location?.name || eventData.location?.address?.streetAddress || 'London, UK',
+              description: eventData.description?.substring(0, 200) || 'Theatre meetup event',
+              url: eventData.url || url,
+              source: 'Meetup'
+            });
+          }
+        } catch (e) {
+          // Skip invalid JSON
+        }
+      });
+      
+      await new Promise(resolve => setTimeout(resolve, 1500));
+      
+    } catch (error) {
+      console.log(`⚠️ Could not scrape Meetup:`, error.message);
+    }
   }
-];
+  
+  console.log(`✅ Found ${events.length} Meetup events`);
+  return events;
+}
+
+// Scrape The Stage for industry events
+async function scrapeTheStage() {
+  const events = [];
+  
+  try {
+    console.log(`🔍 Scraping The Stage...`);
+    
+    const response = await fetch('https://www.thestage.co.uk/advice/events/', {
+      headers: {
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'
+      }
+    });
+    
+    const html = await response.text();
+    const $ = cheerio.load(html);
+    
+    // Look for event listings
+    $('.event-item, article').each((i, elem) => {
+      try {
+        const title = $(elem).find('h2, h3, .event-title').first().text().trim();
+        const dateText = $(elem).find('.event-date, time, .date').first().text().trim();
+        const description = $(elem).find('p, .excerpt').first().text().trim().substring(0, 200);
+        const link = $(elem).find('a').first().attr('href');
+        
+        if (title && dateText) {
+          // Try to parse the date (this is approximate)
+          const date = new Date(dateText);
+          if (!isNaN(date.getTime()) && date > new Date()) {
+            events.push({
+              title: `The Stage: ${title}`,
+              start: date,
+              end: new Date(date.getTime() + 2 * 60 * 60 * 1000),
+              location: 'London (check event details)',
+              description: description || 'Industry event from The Stage',
+              url: link?.startsWith('http') ? link : `https://www.thestage.co.uk${link}`,
+              source: 'The Stage'
+            });
+          }
+        }
+      } catch (e) {
+        // Skip invalid entries
+      }
+    });
+    
+  } catch (error) {
+    console.log(`⚠️ Could not scrape The Stage:`, error.message);
+  }
+  
+  console.log(`✅ Found ${events.length} The Stage events`);
+  return events;
+}
+
+// Scrape Arts Jobs for London theatre/performance events
+// Filters: London (region 3), Theatre (23), Dance (29), Performing Arts (33), Combined Arts (35)
+async function scrapeArtsJobs() {
+  const events = [];
+  
+  try {
+    console.log(`🔍 Scraping Arts Jobs...`);
+    
+    const url = 'https://www.artsjobs.org.uk/events/search?regions_in_england%5B%5D=3&art_form%5B%5D=23&art_form%5B%5D=29&art_form%5B%5D=33&art_form%5B%5D=35';
+    
+    const response = await fetch(url, {
+      headers: {
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'
+      }
+    });
+    
+    const html = await response.text();
+    const $ = cheerio.load(html);
+    
+    // Arts Jobs uses a specific structure for event listings
+    $('.views-row, .event-listing, article.node--type-event').each((i, elem) => {
+      try {
+        const title = $(elem).find('h2, h3, .event-title, a.title').first().text().trim();
+        const dateText = $(elem).find('.field--name-field-event-date, .event-date, time').first().text().trim();
+        const description = $(elem).find('.field--name-body, .description, p').first().text().trim().substring(0, 200);
+        const location = $(elem).find('.field--name-field-location, .location').first().text().trim();
+        let link = $(elem).find('a').first().attr('href');
+        
+        if (title && dateText) {
+          // Parse date - Arts Jobs typically uses formats like "01 Feb 2026"
+          const date = new Date(dateText);
+          if (!isNaN(date.getTime()) && date > new Date()) {
+            // Make sure link is absolute
+            if (link && !link.startsWith('http')) {
+              link = `https://www.artsjobs.org.uk${link}`;
+            }
+            
+            events.push({
+              title: title,
+              start: date,
+              end: new Date(date.getTime() + 2 * 60 * 60 * 1000),
+              location: location || 'London, UK',
+              description: description || 'Theatre/performing arts event in London',
+              url: link || url,
+              source: 'Arts Jobs'
+            });
+          }
+        }
+      } catch (e) {
+        // Skip invalid entries
+      }
+    });
+    
+  } catch (error) {
+    console.log(`⚠️ Could not scrape Arts Jobs:`, error.message);
+  }
+  
+  console.log(`✅ Found ${events.length} Arts Jobs events`);
+  return events;
+}
+
+// Manual events - add your own events here when you find them!
+// Example format:
+// {
+//   title: "Event Name",
+//   start: new Date('2026-03-15T19:00:00'),
+//   end: new Date('2026-03-15T21:00:00'),
+//   location: "Venue Address",
+//   description: "Event description",
+//   url: "https://venue-website.com",
+//   source: "Venue Name"
+// }
+const manualEvents = [];
 
 async function sendEmailNotification(newEvents) {
   if (!EMAIL_CONFIG.enabled || !EMAIL_CONFIG.to || newEvents.length === 0) {
@@ -385,8 +286,14 @@ async function generateCalendar() {
     console.log('🎭 Starting calendar generation...\n');
     
     // Fetch events from multiple sources
-    const eventbriteEvents = await scrapeEventbrite();
-    const allEvents = [...manualEvents, ...eventbriteEvents];
+    const [eventbriteEvents, meetupEvents, stageEvents, artsJobsEvents] = await Promise.all([
+      scrapeEventbrite(),
+      scrapeMeetup(),
+      scrapeTheStage(),
+      scrapeArtsJobs()
+    ]);
+    
+    const allEvents = [...manualEvents, ...eventbriteEvents, ...meetupEvents, ...stageEvents, ...artsJobsEvents];
     
     // Remove duplicates and filter future events
     const now = new Date();
@@ -659,6 +566,9 @@ async function generateCalendar() {
     console.log(`📅 ${uniqueEvents.length} total events`);
     console.log(`🆕 ${newEvents.length} new events`);
     console.log(`📡 ${eventbriteEvents.length} from Eventbrite`);
+    console.log(`👥 ${meetupEvents.length} from Meetup`);
+    console.log(`📰 ${stageEvents.length} from The Stage`);
+    console.log(`🎨 ${artsJobsEvents.length} from Arts Jobs`);
     console.log(`📝 ${manualEvents.length} manual entries`);
     
   } catch (error) {
